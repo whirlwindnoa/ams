@@ -1,0 +1,5 @@
+let cookieCache = {};
+
+export {
+    cookieCache
+}

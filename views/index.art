@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AMS - Index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+
+<div class="hero">
+    <div class="panel">
+        <h1 class="title">Auditorium Management Software</h1>
+        <p class="subtitle">Manage your events, bookings and seating plans using AMS</p>
+
+        <div class="buttons">
+            <a href="/login" class="btn primary">Login</a>
+            <a href="/register" class="btn ghost">Register</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

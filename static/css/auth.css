@@ -1,0 +1,218 @@
+/* Global */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    background: #0f172a;
+    color: #e5e7eb;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hero container */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+/* Card panel */
+.panel {
+    background: #020617;
+    padding: 2.5rem 1rem;
+    border-radius: 1.2rem;
+    border: 1px solid #1f2937;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    min-width: 600px;
+    max-width: fit-content;
+    width: 100%;
+    text-align: center;
+}
+
+/* Typography */
+.title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    margin-bottom: 1.8rem;
+}
+
+/* Buttons */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn {
+    text-decoration: none;
+    padding: 0.65rem 1.4rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    transition: 0.15s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* Primary button */
+.btn.primary {
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    color: white;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+}
+
+/* Ghost button (used on landing page) */
+.btn.ghost {
+    border: 1px solid #374151;
+    color: #e5e7eb;
+    background: transparent;
+}
+
+.btn.ghost:hover {
+    background: #0b1120;
+}
+
+.btn.full {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+/* Links */
+.link {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.link-muted {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.link-muted:hover {
+    color: #e5e7eb;
+}
+
+.small-link {
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+/* Forms */
+.form {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+.form input {
+    background: #020617;
+    border-radius: 0.6rem;
+    border: 1px solid #1f2937;
+    padding: 0.5rem 0.7rem;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.form input::placeholder {
+    color: #6b7280;
+}
+
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.form-row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+/* Checkbox */
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.checkbox input {
+    width: 14px;
+    height: 14px;
+}
+
+/* Switch text under form */
+.switch-text {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-top: 0.2rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .panel {
+        padding: 1.8rem 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-row-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+}
+
+.btn:disabled {
+    background: #3a3a3a !important;   /* gray */
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;             /* prevents clicking */
+}

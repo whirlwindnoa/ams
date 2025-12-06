@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AMS - Index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+
+<div class="hero">
+    <div class="panel">
+        <h1 class="title">Oh no!!!! An error occured.</h1>
+        <p class="subtitle"><%- message %></p>
+
+        <div class="buttons">
+            <% if (referer) { %>
+                <a href="/" class="btn primary">Go back</a>
+            <% } %>
+            <a href="/" class="btn ghost">Go to homepage</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

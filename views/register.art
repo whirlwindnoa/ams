@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AMS - Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/auth.css">
+
+    <style>
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* the bubble */
+        .pw-error {
+            display: inline-flex;
+            visibility: hidden;
+            align-items: center;  
+            justify-content: center;
+            align-self: center;    
+            height: 2rem;
+            margin-top: 3.7%;
+
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="panel">
+        <h1 class="title">Create an account</h1>
+        <p class="subtitle">Set up your profile to start planning and managing events</p>
+
+        <form class="form" method="POST" action="/api/auth/register">
+            <div class="form-group">
+                <label for="name">Username</label>
+                <input id="name" name="username" type="text" placeholder="Your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="org">Organization (optional)</label>
+                <input id="org" name="organization" type="text" placeholder="School / company / team">
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm">Confirm password</label>
+                    <input id="confirm" name="confirmPassword" type="password" placeholder="••••••••" required>
+                </div>
+                <span id="passwordmatch" class="pw-error">Passwords do not match.</span>
+            </div>
+
+            <button id="submitbtn" type="submit" class="btn primary full">Create account</button>
+        </form>
+
+        <p class="switch-text">
+            Already have an account?
+            <a href="/login" class="link">Login</a>
+        </p>
+
+        <a href="/" class="link-muted small-link">← Back to home</a>
+    </div>
+</div>
+
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const pass = document.getElementById("password");
+        const confirm = document.getElementById("confirm");
+        const bubble = document.getElementById("passwordmatch");
+        const submit = document.getElementById("submitbtn");
+
+        function checkMatch() {
+            const match = pass.value === confirm.value && pass.value !== "";
+
+            if (match) {
+                bubble.style.visibility = "hidden";
+                submit.disabled = false;
+            } else {
+                bubble.style.visibility = "visible";
+                submit.disabled = true;
+            }
+        }
+
+        pass.addEventListener("input", checkMatch);
+        confirm.addEventListener("input", checkMatch);
+
+        // Disable button initially
+        submit.disabled = true;
+    });
+</script>
+</html>

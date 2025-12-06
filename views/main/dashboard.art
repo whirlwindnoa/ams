@@ -1,0 +1,118 @@
+{{extend "./dashboard_layout.art"}}
+
+{{block "content"}}
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="muted">Overview of today’s events and bookings.</p>
+        </div>
+        <button class="btn primary">+ New Booking</button>
+    </div>
+
+    <section class="cards">
+        <div class="card">
+            <div class="card-label">Today’s Events</div>
+            <div class="card-value">3</div>
+            <div class="card-sub">2 ongoing · 1 upcoming</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Seats Booked</div>
+            <div class="card-value">428</div>
+            <div class="card-sub">Out of 600 total</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Revenue Today</div>
+            <div class="card-value">$5,240</div>
+            <div class="card-sub">+18% vs yesterday</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Pending Requests</div>
+            <div class="card-value">4</div>
+            <div class="card-sub">Awaiting approval</div>
+        </div>
+    </section>
+
+    <section class="grid-2">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Upcoming Events</h2>
+                <button class="btn ghost small">View all</button>
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Booked / Capacity</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>School Concert</td>
+                    <td>12 Dec 2025</td>
+                    <td>18:00</td>
+                    <td>350 / 400</td>
+                    <td><span class="status-pill green">Confirmed</span></td>
+                </tr>
+                <tr>
+                    <td>Tech Conference</td>
+                    <td>14 Dec 2025</td>
+                    <td>09:00</td>
+                    <td>120 / 300</td>
+                    <td><span class="status-pill orange">Draft</span></td>
+                </tr>
+                <tr>
+                    <td>Drama Performance</td>
+                    <td>16 Dec 2025</td>
+                    <td>19:30</td>
+                    <td>280 / 350</td>
+                    <td><span class="status-pill blue">On sale</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Quick Booking</h2>
+            </div>
+            <form class="form">
+                <div class="form-group">
+                    <label for="event-name">Event name</label>
+                    <input id="event-name" type="text" placeholder="e.g. Graduation Ceremony">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-date">Date</label>
+                        <input id="event-date" type="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-time">Start time</label>
+                        <input id="event-time" type="time">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="seats">Seats reserved</label>
+                        <input id="seats" type="number" min="1" placeholder="e.g. 150">
+                    </div>
+                    <div class="form-group">
+                        <label for="client">Client name</label>
+                        <input id="client" type="text" placeholder="Organization / person">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Internal notes</label>
+                    <textarea id="notes" rows="3" placeholder="Technical requirements, equipment, etc."></textarea>
+                </div>
+
+                <button type="submit" class="btn primary full">Save Booking</button>
+            </form>
+        </div>
+    </section>
+{{/block}}

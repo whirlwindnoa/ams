@@ -1,0 +1,73 @@
+{{extend "./dashboard_layout.art"}}
+
+{{block "content"}}
+<div class="page-header">
+    <div>
+        <h1>Seating Plan</h1>
+        <p class="muted">Secondary Campus Auditorium – 840 seats.</p>
+    </div>
+    <div class="seating-actions">
+        <button class="btn ghost small">Export layout</button>
+        <button class="btn primary small">Save changes</button>
+    </div>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Screen / Stage</h2>
+    </div>
+    <div class="stage-bar">STAGE</div>
+
+    <div class="seating-legend">
+        <span class="seat seat-legend available"></span> Available
+        <span class="seat seat-legend reserved"></span> Reserved
+        <span class="seat seat-legend blocked"></span> Blocked
+        <span class="seat seat-legend selected"></span> Selected
+    </div>
+
+    <div class="seating-meta">
+        <span>Total seats: <strong>840</strong></span>
+        <span>Selected: <strong id="selected-count">0</strong></span>
+    </div>
+
+    <div class="seating-wrapper">
+        <!-- 21 rows × 40 seats = 840 -->
+        {{each ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'] as row}}
+        <div class="seat-row">
+            <div class="seat-row-label">
+                Row {{row}}
+            </div>
+            <div class="seat-grid">
+                {{each [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40] as col}}
+                <div class="seat available"
+                    data-row="{{row}}"
+                    data-seat="{{col}}">
+                    {{col}}
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const seats = document.querySelectorAll(".seat-grid .seat.available, .seat-grid .seat.selected");
+    const selectedCount = document.getElementById("selected-count");
+
+    function updateCount() {
+        selectedCount.textContent = document.querySelectorAll(".seat.selected").length;
+    }
+
+    seats.forEach(seat => {
+        seat.addEventListener("click", () => {
+            seat.classList.toggle("selected");
+            updateCount();
+        });
+    });
+
+    updateCount();
+});
+</script>
+{{/block}}
