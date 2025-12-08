@@ -41,16 +41,6 @@
 
         <form class="form" method="POST" action="/api/auth/register">
             <div class="form-group">
-                <label for="name">Username</label>
-                <input id="name" name="username" type="text" placeholder="Your name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="org">Organization (optional)</label>
-                <input id="org" name="organization" type="text" placeholder="School / company / team">
-            </div>
-
-            <div class="form-group">
                 <label for="email">E-mail</label>
                 <input id="email" name="email" type="email" placeholder="you@example.com" required>
             </div>

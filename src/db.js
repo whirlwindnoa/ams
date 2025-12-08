@@ -24,9 +24,8 @@ class Database {
         this.run(
             `CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
                 is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1)),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );`
@@ -40,8 +39,6 @@ class Database {
                 token TEXT NOT NULL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 expires INTEGER NOT NULL,
-                ip TEXT,
-                date INTEGER,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )`
         );

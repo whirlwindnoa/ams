@@ -24,13 +24,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-express.response.error = function(message, status = 400)  {
-    return this.status(status).render('error.art', {
-        message,
-        referer: this.req.get('referer'),
-    });
-}
-
 app.engine('art', art);
 app.set("views", "./views");
 app.set('view engine', 'art');

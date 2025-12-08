@@ -15,8 +15,8 @@
 
         <form class="form" method="POST" action="/api/auth/login">
             <div class="form-group">
-                <label for="email">Username</label>
-                <input id="email" name="username" type="text" placeholder="you@example.com" required>
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="text" placeholder="you@example.com" required>
             </div>
 
             <div class="form-group">

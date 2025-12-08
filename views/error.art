@@ -11,11 +11,11 @@
 <div class="hero">
     <div class="panel">
         <h1 class="title">Oh no!!!! An error occured.</h1>
-        <p class="subtitle"><%- message %></p>
+        <p class="subtitle"><%- error %></p>
 
         <div class="buttons">
             <% if (referer) { %>
-                <a href="/" class="btn primary">Go back</a>
+                <a href="<%- referer %>" class="btn primary">Go back</a>
             <% } %>
             <a href="/" class="btn ghost">Go to homepage</a>
         </div>
