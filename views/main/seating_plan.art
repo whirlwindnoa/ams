@@ -4,11 +4,11 @@
 <div class="page-header">
     <div>
         <h1>Seating Plan</h1>
-        <p class="muted">Secondary Campus Auditorium – 840 seats.</p>
+        <p class="muted">Secondary Campus Auditorium – <span id="total-seats">840</span> seats.</p>
     </div>
     <div class="seating-actions">
-        <button class="btn ghost small">Export layout</button>
-        <button class="btn primary small">Save changes</button>
+        <button class="btn ghost small" type="button">Export layout</button>
+        <button class="btn primary small" type="button">Save changes</button>
     </div>
 </div>
 
@@ -26,23 +26,28 @@
     </div>
 
     <div class="seating-meta">
-        <span>Total seats: <strong>840</strong></span>
+        <span>Total seats: <strong id="total-seats-strong">840</strong></span>
         <span>Selected: <strong id="selected-count">0</strong></span>
     </div>
 
-    <div class="seating-wrapper">
-        <!-- 21 rows × 40 seats = 840 -->
-        {{each ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'] as row}}
+    <!-- Edit these two values to change height/width -->
+    {{set rows = 21}}
+    {{set cols = 40}}
+
+    <div class="seating-wrapper"
+         style="--cols: {{cols}};"
+         data-rows="{{rows}}"
+         data-cols="{{cols}}">
+        {{each Array.from({length: rows}) as _, r}}
         <div class="seat-row">
-            <div class="seat-row-label">
-                Row {{row}}
-            </div>
+            <div class="seat-row-label">Row {{r + 1}}</div>
+
             <div class="seat-grid">
-                {{each [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40] as col}}
+                {{each Array.from({length: cols}) as __, c}}
                 <div class="seat available"
-                    data-row="{{row}}"
-                    data-seat="{{col}}">
-                    {{col}}
+                     data-row="{{r + 1}}"
+                     data-seat="{{c + 1}}">
+                    {{c + 1}}
                 </div>
                 {{/each}}
             </div>
@@ -53,21 +58,38 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const seats = document.querySelectorAll(".seat-grid .seat.available, .seat-grid .seat.selected");
+    const wrapper = document.querySelector(".seating-wrapper");
     const selectedCount = document.getElementById("selected-count");
+    const totalSeats = document.getElementById("total-seats");
+    const totalSeatsStrong = document.getElementById("total-seats-strong");
 
-    function updateCount() {
+    function updateTotals() {
+        const rows = Number(wrapper.dataset.rows) || 0;
+        const cols = Number(wrapper.dataset.cols) || 0;
+        const total = rows * cols;
+
+        totalSeats.textContent = total;
+        totalSeatsStrong.textContent = total;
+    }
+
+    function updateSelectedCount() {
         selectedCount.textContent = document.querySelectorAll(".seat.selected").length;
     }
 
-    seats.forEach(seat => {
-        seat.addEventListener("click", () => {
-            seat.classList.toggle("selected");
-            updateCount();
-        });
+    // Event delegation (faster + works even if you later re-render seats)
+    wrapper.addEventListener("click", (e) => {
+        const seat = e.target.closest(".seat");
+        if (!seat) return;
+
+        // Optional: prevent toggling if blocked/reserved
+        if (seat.classList.contains("blocked") || seat.classList.contains("reserved")) return;
+
+        seat.classList.toggle("selected");
+        updateSelectedCount();
     });
 
-    updateCount();
+    updateTotals();
+    updateSelectedCount();
 });
 </script>
 {{/block}}

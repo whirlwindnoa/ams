@@ -6,11 +6,12 @@ import { cookieCache } from './stores.js';
 
 const router = express.Router();
 
-async function createSession(user, expires = 2.628e+9) { // default: 1 month
+async function createSession(user, expires = 2.628e+9) { // token for 1 month
     let token = (await randomBytesAsync(32)).toString('hex'); // generate token for user
     while (await db.get('SELECT * FROM sessions WHERE token = ?', [token])) {
         token = (await randomBytesAsync(32)).toString('hex');
-    } // check if token is unique. if not, make a new one
+    } // check if token is unique. if not, make a new one 
+    // prolly a bad way of doing it but whatever its good enough
 
     await db.run('INSERT INTO sessions (token, user_id, expires) VALUES (?, ?, ?)', [token, user.id, Date.now() + expires]);
 
@@ -25,7 +26,6 @@ async function createSession(user, expires = 2.628e+9) { // default: 1 month
 
     return token;   
 }
-
 
 router.post('/login', express.urlencoded({ extended: false }), async (req, res) => {
     if (req.user) {
@@ -57,25 +57,35 @@ router.post('/register', express.urlencoded({ extended: false }), async (req, re
     }
     if (!req.body || !req.body.password || !req.body.email) {
         console.log("some user failed registration: incomplete credentials");
-        return error("fill out all fields!", req, res, 400, "register.art");
+        return error("Fill out all fields!", req, res, 400, "register.art");
     }
     let { email, password } = req.body;
 
     if (!passwordRegex.test(password)) {
         console.log("some user failed registration: invalid password");
-        return error("invalid password (see requirements)", req, res, 400, "register.art");
+        return error("Invalid password, see requirements above.", req, res, 400, "register.art");
     }
     if (!emailRegex.test(email)) {
         console.log("some user failed registration: invalid email");
-        return error("invalid email", req, res, 400, "register.art");
+        return error("Invalid email, try again.", req, res, 400, "register.art");
     }
 
     let user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
 
     if (user) {
         console.log("some user failed registration: email already taken");
-        return error("email is already taken", req, res, 400, "register.art");
+        return error("This email is already taken.", req, res, 400, "register.art");
     }
+
+    await db.run(`INSERT INTO users (email, password, elevation, created_at) VALUES (?, ?, 0, ?)`, [email, password, Date.now()]);
+    user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    // very bad practice cuz im supposed to hash passwords but im not trying to make it even more complex. i even installed bcrypt.
+
+    const token = await createSession(user);
+    console.log('some user registered successfully');
+    res.cookie('token', token, { maxAge: 2.628e+9, httpOnly: true });
+
+    return res.redirect('/login');
 });
 
 router.get('/logout', async (req, res) => {

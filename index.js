@@ -12,8 +12,10 @@ import cookieParser from 'cookie-parser';
 
 import db from './src/db.js'
 import { cookieCache } from './src/stores.js';
+
 import portalRouter from './src/portal.js';
 import authRouter from './src/auth.js';
+import featuresRouter from './src/features.js';
 
 if(!fs.existsSync('.env')) {
     fs.copyFileSync('.env.template', '.env');
@@ -69,6 +71,7 @@ app.use(async (req, res, next) => { // on every request to the server
 });
 
 app.use('/api/auth', authRouter); // routing to auth related endpoints
+app.use('/api', featuresRouter); // routing to feature related endpoints
 app.use(portalRouter); // routing to render pages
 
 app.listen(process.env.PORT, () => {

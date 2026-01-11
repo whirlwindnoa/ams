@@ -5,6 +5,12 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.error {
+    color: rgb(200, 25, 25);
+    margin: 15px;
+    margin-top: 0;
+}
+
 body {
     background: #0f172a; /* dark slate */
     color: #e5e7eb;
@@ -120,7 +126,6 @@ body {
     color: #6b7280;
 }
 
-/* --- Main content --- */
 .main {
     padding: 1.5rem;
 }
@@ -141,7 +146,6 @@ body {
     font-size: 0.9rem;
 }
 
-/* --- Buttons --- */
 .btn {
     border: none;
     border-radius: 999px;
@@ -177,7 +181,6 @@ body {
     width: 100%;
 }
 
-/* --- Cards --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -209,7 +212,6 @@ body {
     color: #6b7280;
 }
 
-/* --- Panels --- */
 .grid-2 {
     display: grid;
     grid-template-columns: 3fr 2fr;
@@ -234,7 +236,6 @@ body {
     font-size: 1rem;
 }
 
-/* --- Table --- */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -264,7 +265,6 @@ body {
     background: #0b1120;
 }
 
-/* --- Status pills --- */
 .status-pill {
     padding: 0.15rem 0.6rem;
     border-radius: 999px;
@@ -286,7 +286,16 @@ body {
     color: #60a5fa;
 }
 
-/* --- Form --- */
+.status-pill.red {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.status-pill.gray {
+    background: rgba(156, 163, 175, 0.15);
+    color: #9ca3af;
+}
+
 .form {
     display: flex;
     flex-direction: column;

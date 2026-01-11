@@ -1,0 +1,272 @@
+{{extend "./dashboard_layout.art"}}
+{{block "content"}}
+    <style>
+        .stretch-horizontal {
+            grid-column: 1 / -1;
+        }
+        .table-wrapper {
+            overflow: auto;
+            padding-top: 0.25rem;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal.hidden { display: none; }
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(2,6,23,0.6);
+            backdrop-filter: blur(2px);
+        }
+        .modal-panel {
+            position: relative;
+            background: #020617;
+            border: 1px solid #1f2937;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            width: 520px;
+            max-width: calc(100% - 32px);
+            z-index: 60;
+        }
+        .modal-panel h3 { margin-bottom: 0.5rem; }
+        .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem; }
+
+        .form select {
+            width: 100%;
+            height: 44px;
+            padding: 0 44px 0 14px;
+
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+
+            color: #fff;
+            font-size: 14px;
+
+            outline: none;
+            cursor: pointer;
+
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .form select:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .form select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+        }
+
+        .form select option {
+            background: #0b1220;
+            color: #ffffff;
+        }
+
+        .form select {
+            background-image:
+                linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.6) 50%),
+                linear-gradient(135deg, rgba(255,255,255,0.6) 50%, transparent 50%);
+            background-position:
+                calc(100% - 20px) 50%,
+                calc(100% - 14px) 50%;
+            background-size: 6px 6px;
+            background-repeat: no-repeat;
+        }
+
+        #ev-status {
+            height: 40px;
+            padding: 0 36px 0 12px; 
+            line-height: 40px;
+            box-sizing: border-box;
+        }
+
+        .form-row {
+            align-items: flex-end;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+        }
+
+        .btn-action {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Edit */
+        .btn-action.edit {
+            background: rgba(59,130,246,.15);
+            color: #60a5fa;
+        }
+
+        /* Delete */
+        .btn-action.delete {
+            background: rgba(239,68,68,.15);
+            color: #f87171;
+        }
+
+        .btn-action:hover {
+            filter: brightness(1.15);
+        }
+    </style>
+    <div class="page-header">
+        <div>
+            <h1>Events</h1>
+            <p class="muted">Events are sorted in ascending order by date, from the earliest to latest. Completed events are hidden by default.</p>
+        </div>
+        <button id="new-event-btn" class="btn primary" type="button">+ New Event</button>
+    </div>
+    
+    <div id="event-modal" class="modal hidden" aria-hidden="true">
+        <div class="modal-backdrop" id="event-modal-backdrop"></div>
+        <div class="modal-panel">
+        
+            <h3>New Event</h3>
+            <p class="muted">Required fields are marked with *</p><br>
+            <% if (error) { %> 
+                <p class="error"><%- error %></p>
+            <% } %>
+            <form id="new-event-form" class="form" method="POST" action="/api/events/add">
+                <div class="form-group">
+                    <label for="ev-name">Event name*</label>
+                    <input id="ev-name" name="name" type="text" placeholder="Event title" maxlength="24" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ev-date">Date*</label>
+                        <input id="ev-date" name="date" type="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ev-time">Time*</label>
+                        <input id="ev-time" name="time" type="time" required>
+                    </div>
+
+                    <div class="form-group status-group">
+                        <label for="ev-status">Status*</label>
+                        <select id="ev-status" name="status" required>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                            <option value="postponed">Postponed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ev-cap">Capacity*</label>
+                    <input id="ev-cap" name="capacity" type="number" min="1" placeholder="Capacity" axlength="4" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ev-notes">Notes / Venue</label>
+                    <input id="ev-notes" name="notes" type="text" placeholder="Venue or notes">
+                </div>
+
+                <div class="modal-actions">
+                    <button id="cancel-event" type="button" class="btn ghost">Cancel</button>
+                    <button id="create-event" type="submit" class="btn primary">Create Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <section class="grid-2">
+        <div class="panel stretch-horizontal">
+            <div class="panel-header">
+                <h2>Event list</h2>
+            </div>
+
+            <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date and time</th>
+                    <th>Created by</th>
+                    <th>Booked / Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{each events as event}}
+                <tr>
+                    <td><%- event.name %></td>
+                    <td><%- event.dateStr %> <%- event.timeStr %></td>
+                    <td><%- event.added_by_email %></td>
+                    <td><%- event.booked %> / <%- event.capacity %></td>
+                    <% if (event.status == 'scheduled') { %>
+                        <td><span class="status-pill blue">Scheduled</span></td>
+                    <% } else if (event.status == 'ongoing') { %>
+                        <td><span class="status-pill green">Ongoing</span></td>
+                    <% } else if (event.status == 'completed') { %>
+                        <td><span class="status-pill gray">Completed</span></td>
+                    <% } else if (event.status == 'postponed') { %>
+                        <td><span class="status-pill orange">Postponed</span></td>
+                    <% } else if (event.status == 'cancelled') { %>
+                        <td><span class="status-pill red">Cancelled</span></td>
+                    <% } %>
+                    <td class="actions">
+                        <button class="btn-action edit">Edit</button>
+                        <button class="btn-action delete" onclick="deleteTile(<%- event.id %>)">Delete</button>
+                    </td>
+                </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBtn = document.getElementById('new-event-btn');
+            const modal = document.getElementById('event-modal');
+            const backdrop = document.getElementById('event-modal-backdrop');
+            const cancelBtn = document.getElementById('cancel-event');
+            const form = document.getElementById('new-event-form');
+            const tbody = document.querySelector('.table tbody');
+
+            function openModal() {
+                modal.classList.remove('hidden');
+                modal.setAttribute('aria-hidden', 'false');
+            }
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+                form.reset();
+            }
+
+            openBtn.addEventListener('click', openModal);
+            cancelBtn.addEventListener('click', closeModal);
+            backdrop.addEventListener('click', closeModal);
+        });
+
+        function deleteTile(id) {
+            if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                fetch(`/api/events/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) location.reload();
+                    else alert('You do not have permission to delete this event.');
+                });
+            }
+        }
+    </script>
+{{/block}}

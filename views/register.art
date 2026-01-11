@@ -38,6 +38,7 @@
     <div class="panel">
         <h1 class="title">Create an account</h1>
         <p class="subtitle">Set up your profile to start planning and managing events</p>
+        <p class="subtitle">Your password must have 8 characters, upper case and lower case and a number.</p>
 
         <% if (error) { %> 
             <p class="error"><%- error %></p>
@@ -58,7 +59,7 @@
                     <label for="confirm">Confirm password</label>
                     <input id="confirm" name="confirmPassword" type="password" placeholder="••••••••" required>
                 </div>
-                <span id="passwordmatch" class="pw-error">Passwords do not match.</span>
+                <span id="passwordmatch" class="pw-error"></span>
             </div>
 
             <button id="submitbtn" type="submit" class="btn primary full">Create account</button>
@@ -81,16 +82,40 @@
         const bubble = document.getElementById("passwordmatch");
         const submit = document.getElementById("submitbtn");
 
+        function hasLowerAndUpper(str) {
+            return /[a-z]/.test(str) && /[A-Z]/.test(str);
+        }
+
         function checkMatch() {
             const match = pass.value === confirm.value && pass.value !== "";
 
-            if (match) {
-                bubble.style.visibility = "hidden";
-                submit.disabled = false;
-            } else {
+            if (pass.value.length < 8 && pass.value.length > 0) {
                 bubble.style.visibility = "visible";
+                bubble.innerText = "Too short.";
                 submit.disabled = true;
+                return;
             }
+            if (!hasLowerAndUpper(pass.value)) {
+                bubble.style.visibility = "visible";
+                bubble.innerText = "Must have both cases.";
+                submit.disabled = true;
+                return;
+            }
+            if (!(/\d/.test(pass.value))) {
+                bubble.style.visibility = "visible";
+                bubble.innerText = "Must have a number.";
+                submit.disabled = true;
+                return;
+            }
+            if (!match) {
+                bubble.style.visibility = "visible";
+                bubble.innerText = "Passwords do not match.";
+                submit.disabled = true;
+                return;
+            }
+            console.log('hi');
+            bubble.style.visibility = "hidden";
+            submit.disabled = false;
         }
 
         pass.addEventListener("input", checkMatch);

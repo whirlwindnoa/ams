@@ -27,7 +27,7 @@ class Database {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                elevation INTEGER NOT NULL DEFAULT 0 CHECK (elevation IN (0, 2)),
+                elevation INTEGER NOT NULL DEFAULT 0 CHECK (elevation IN (0, 1, 2)),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );`
         )
@@ -44,10 +44,24 @@ class Database {
             )`
         );
 
+        this.run(
+            `CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                date DATETIME,
+                booked INTEGER NOT NULL DEFAULT 0,
+                capacity INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                notes TEXT,
+                added_by INTEGER NOT NULL,
+                FOREIGN KEY (added_by) REFERENCES users(id) ON DELETE CASCADE
+            )`
+        );
+
         return connection;
     }
 
-    // returns a template function for all three methods (run, get, all)
+    // returns a template function for all three methods
     // run -> no return value
     // get -> first matching result
     // all -> all matching results
