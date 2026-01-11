@@ -12,8 +12,6 @@
     <div class="panel">
         <h1 class="title">Auditorium Management Software</h1>
         <p class="subtitle">Manage your events, bookings and seating plans using AMS</p>
-        <p class="error"><%- error %></p>
-
         <div class="buttons">
             <a href="/login" class="btn primary">Login</a>
             <a href="/register" class="btn ghost">Register</a>

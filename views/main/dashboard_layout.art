@@ -15,7 +15,7 @@
     <div class="topbar-right">
         <input type="text" class="search" placeholder="Search events, bookings...">
         <div class="user">
-            <span class="user-name">{{ user.username }}</span>
+            <span class="user-name">{{ user.email }} </span>
             <a href="/api/auth/logout" class="btn small ghost logout-btn">Sign Out</a>
         </div>
         
@@ -26,10 +26,10 @@
     <nav class="sidebar">
         <ul>
             <li class="sidebar-section">Main</li>
-            <li class="active"><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
             <li><a href="/events">Events</a></li>
             <li><a href="/bookings">Bookings</a></li>
-            <li><a href="/seating">Seating Plan</a></li>
+            <li><a href="/dashboard/plan">Seating Plan</a></li>
 
             <li class="sidebar-section">Management</li>
             <li><a href="/clients">Clients</a></li>
@@ -45,4 +45,17 @@
     </main>
 </div>
 </body>
+<script>
+    // Highlight active sidebar link
+    document.addEventListener("DOMContentLoaded", () => {
+        const sidebarLinks = document.querySelectorAll(".sidebar a");
+        const currentPath = window.location.pathname;
+
+        sidebarLinks.forEach(link => {
+            if (link.getAttribute("href") == currentPath) {
+                link.parentElement.classList.add("active");
+            }
+        });
+    });
+</script>
 </html>

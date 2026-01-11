@@ -21,12 +21,13 @@ class Database {
         });
 
         // create tables & fill them out
+        // elevation -> (0: normal user, 1: staff, 2: admin)
         this.run(
             `CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1)),
+                elevation INTEGER NOT NULL DEFAULT 0 CHECK (elevation IN (0, 2)),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );`
         )

@@ -9,7 +9,7 @@ const router = express.Router();
 async function createSession(user, expires = 2.628e+9) { // default: 1 month
     let token = (await randomBytesAsync(32)).toString('hex'); // generate token for user
     while (await db.get('SELECT * FROM sessions WHERE token = ?', [token])) {
-        token = (await utils.randomBytesAsync(32)).toString('hex');
+        token = (await randomBytesAsync(32)).toString('hex');
     } // check if token is unique. if not, make a new one
 
     await db.run('INSERT INTO sessions (token, user_id, expires) VALUES (?, ?, ?)', [token, user.id, Date.now() + expires]);
@@ -45,10 +45,10 @@ router.post('/login', express.urlencoded({ extended: false }), async (req, res) 
     }
 
     let token = await createSession(user);
-    res.cookie('token', token, { maxAge: 2.628+9, httpOnly: true });
+    res.cookie('token', token, { maxAge: 2.628e+9, httpOnly: true });
 
     console.log('successful login');
-    res.redirect(req.get('referer') ?? '/dashboard');
+    res.redirect('/dashboard');
 });
 
 router.post('/register', express.urlencoded({ extended: false }), async (req, res) => {

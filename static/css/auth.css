@@ -47,7 +47,7 @@ body {
 .subtitle {
     font-size: 0.95rem;
     color: #9ca3af;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.1rem;
 }
 
 /* Buttons */
@@ -215,4 +215,10 @@ body {
     cursor: not-allowed;
     opacity: 0.6;
     pointer-events: none;             /* prevents clicking */
+}
+
+.error {
+    color: rgb(200, 25, 25);
+    margin: 15px;
+    margin-top: 0;
 }

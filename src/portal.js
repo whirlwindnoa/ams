@@ -26,6 +26,6 @@ router.get('/', signedOutOnly('index.art'));
 
 // dashboard pages (authorized people)
 router.get('/dashboard', signedInOnly('main/dashboard.art', 'Dashboard'));
-router.get('/dashboard/plan', signedInOnly('main/plan.art', 'Seating Plan'));
+router.get('/dashboard/plan', signedInOnly('main/seating_plan.art', 'Seating Plan'));
 
 export default router;

@@ -13,6 +13,10 @@
         <h1 class="title">Welcome back</h1>
         <p class="subtitle">Log in to manage events, bookings and seating plans.</p>
 
+        <% if (error) { %> 
+            <p class="error"><%- error %></p>
+        <% } %>
+
         <form class="form" method="POST" action="/api/auth/login">
             <div class="form-group">
                 <label for="email">E-mail</label>

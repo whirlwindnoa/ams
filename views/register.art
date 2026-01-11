@@ -39,6 +39,10 @@
         <h1 class="title">Create an account</h1>
         <p class="subtitle">Set up your profile to start planning and managing events</p>
 
+        <% if (error) { %> 
+            <p class="error"><%- error %></p>
+        <% } %>
+
         <form class="form" method="POST" action="/api/auth/register">
             <div class="form-group">
                 <label for="email">E-mail</label>
