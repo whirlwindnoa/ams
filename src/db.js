@@ -7,9 +7,7 @@ class Database {
     }
 
     async #init() {
-        console.log(process.env.DATABASE_PATH);
         var connection = await new Promise((resolve, reject) => {
-            // connect to the database
             this.db = new sqlite3.Database(process.env.DATABASE_PATH, sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
                 if (err) {
                     console.log(err);

@@ -37,13 +37,12 @@ router.get('/events/:id', async (req, res) => {
 	}
 });
 
-
 // add event
 router.post('/events/add', express.urlencoded({ extended: false }), async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
-    const { name, date, time, status, capacity, notes } = req.body || {};
+    const { name, date, time, booked, status, capacity, notes } = req.body || {};
 
     if (!name || typeof name !== 'string' || name.trim().length < 3) {
       return res.status(400).json({ error: 'Invalid or missing name (min 3 chars)' });
@@ -52,6 +51,93 @@ router.post('/events/add', express.urlencoded({ extended: false }), async (req, 
     const cap = Number(capacity);
     if (!Number.isInteger(cap) || cap < 1) {
       return res.status(400).json({ error: 'Invalid capacity' });
+    }
+
+    if (booked > cap) {
+      return res.status(400).json({ error: 'Booked seats cannot exceed capacity' });
+    }
+
+    // time fomrating stuff millis into human readable date and time 
+    let unixTime = null;
+    if (date) {
+      const timePart = time && time.trim() ? time : '00:00';
+      const iso = `${date}T${timePart}:00`;
+      const ms = Date.parse(iso);
+
+      if (isNaN(ms)) {
+        return res.status(400).json({ error: 'Invalid date/time' });
+      }
+
+      unixTime = ms;
+    }
+
+    await db.run(`INSERT INTO events (name, date, booked, capacity, status, notes, added_by) VALUES (?, ?, ?, ?, ?, ?, ?)`,[name.trim(), unixTime, booked, cap, status, notes || null, req.user.id]);
+
+    return res.redirect('/dashboard/events');
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// delete event
+router.delete('/events/:id', express.urlencoded({ extended: false }), async (req, res) => {
+	try {
+		if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
+		const id = Number(req.params.id);
+		if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
+
+		const ev = await db.get('SELECT * FROM events WHERE id = ?', [id]);
+		if (!ev) return res.status(404).json({ error: 'Event not found' });
+
+		// allow deletion if admin/staff or creator
+		if (!(req.user.elevation === 'Administrator' || req.user.id === ev.added_by)) {
+			return res.status(403).json({ error: 'Insufficient permissions' });
+		}
+
+		await db.run('DELETE FROM events WHERE id = ?', [id]);
+		return res.json({ success: true });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+// edit event
+router.post('/events/:id/edit', express.urlencoded({ extended: false }), async (req, res) => {
+  try {
+		if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
+		const id = Number(req.params.id);
+		if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
+
+		const ev = await db.get('SELECT * FROM events WHERE id = ?', [id]);
+		if (!ev) return res.status(404).json({ error: 'Event not found' });
+
+		// allow editing if admin/staff or creator
+		if (!(req.user.elevation >= 1 || req.user.id === ev.added_by)) {
+			return res.status(403).json({ error: 'Insufficient permissions' });
+		}
+
+    const { name, date, time, booked, status, capacity, notes } = req.body || {};
+
+    if (capacity > 9999) {
+      return res.status(400).json({ error: 'You cannot have higher capacity than 9999' });
+    }
+
+    if (!name || typeof name !== 'string' || name.trim().length < 3) {
+      return res.status(400).json({ error: 'Invalid or missing name (min 3 chars)' });
+    }
+
+    const cap = Number(capacity);
+    if (!Number.isInteger(cap) || cap < 1) {
+      return res.status(400).json({ error: 'Invalid capacity' });
+    }
+
+    if (booked > cap) {
+      return res.status(400).json({ error: 'Booked seats cannot exceed capacity' });
     }
 
     let unixTime = null;
@@ -67,34 +153,9 @@ router.post('/events/add', express.urlencoded({ extended: false }), async (req, 
       unixTime = ms;
     }
 
-    await db.run(`INSERT INTO events (name, date, capacity, status, notes, added_by) VALUES (?, ?, ?, ?, ?, ?)`,[name.trim(), unixTime, cap, status, notes || null, req.user.id]);
-
+    
+    await db.run(`UPDATE events SET name = ?, date = ?, booked = ?, capacity = ?, status = ?, notes = ? WHERE id = ?`,[name.trim(), unixTime, booked, cap, status, notes || null, id]);
     return res.redirect('/dashboard/events');
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// delete event
-router.delete('/events/:id', async (req, res) => {
-	try {
-		if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-
-		const id = Number(req.params.id);
-		if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
-
-		const ev = await db.get('SELECT * FROM events WHERE id = ?', [id]);
-		if (!ev) return res.status(404).json({ error: 'Event not found' });
-
-		// allow deletion if admin/staff or creator
-		if (!(req.user.elevation >= 1 || req.user.id === ev.added_by)) {
-			return res.status(403).json({ error: 'Insufficient permissions' });
-		}
-
-		await db.run('DELETE FROM events WHERE id = ?', [id]);
-		return res.json({ success: true });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: 'Internal server error' });

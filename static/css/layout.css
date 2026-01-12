@@ -12,7 +12,7 @@
 }
 
 body {
-    background: #0f172a; /* dark slate */
+    background: #0f172a;
     color: #e5e7eb;
 }
 
@@ -75,14 +75,12 @@ body {
     color: #e5e7eb;
 }
 
-/* --- Layout --- */
 .layout {
     display: grid;
     grid-template-columns: 240px 1fr;
     min-height: calc(100vh - 56px);
 }
 
-/* --- Sidebar --- */
 .sidebar {
     background: #020617;
     border-right: 1px solid #1f2937;
@@ -333,14 +331,13 @@ body {
     color: #6b7280;
 }
 
-/* --- Responsive --- */
 @media (max-width: 900px) {
     .layout {
         grid-template-columns: 1fr;
     }
 
     .sidebar {
-        display: none; /* hide sidebar on small screens (simple version) */
+        display: none;
     }
 
     .cards {
