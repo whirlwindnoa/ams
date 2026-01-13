@@ -15,7 +15,7 @@
 {{if venues && venues.length}}
   <section class="venues-grid">
     {{each venues venue}}
-      <div class="venue-card" onclick="location.href='/venues/<%- venue.id %>'">
+      <div class="venue-card">
         <button class="venue-delete-btn" onclick="event.stopPropagation(); deleteVenue(<%- venue.id %>)">
             ✕
         </button>

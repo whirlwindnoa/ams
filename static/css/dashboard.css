@@ -189,3 +189,48 @@
   border-radius: 14px;
 }
 
+.grid-2{
+  display:grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.dash-col{
+  display:flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.panel-compact{
+  min-height: unset !important;
+  height: auto !important;
+}
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.dash-col{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 100%;
+}
+
+/* Upcoming stays natural height */
+.upcoming-panel{
+  flex: 0 0 auto;
+}
+
+/* Venues grows to match calendar height */
+.panel-compact{
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}

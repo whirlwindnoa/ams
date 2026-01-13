@@ -24,7 +24,6 @@ function signedInOnly(page, title) {
 
 router.get('/dashboard/venues', async (req, res) => {
   if (!req.user) return res.redirect('/login');
-  if (req.user.elevation < 1) return error('You do not have permission to view this page.', req, res, 403);
 
   const venues = await db.all(`
     SELECT id, name, location, capacity, image
@@ -64,8 +63,10 @@ router.get('/dashboard', async (req, res) => {
         SELECT id, name, location, capacity, image
         FROM venues
         ORDER BY id DESC
-        LIMIT 5
+        LIMIT 3
     `); 
+
+    console.log(venues);
 
     events.forEach(ev => {
         const d = new Date(ev.date);
@@ -164,7 +165,7 @@ router.get('/dashboard/users', async (req, res) => {
 
 router.get('/dashboard/log', async (req, res) => {
     if (!req.user) return res.redirect('/');
-    if (req.user.elevation < 1) return error('You do not have permission to view this page.', req, res, 403);
+    if (req.user.elevation < 2) return error('You do not have permission to view this page.', req, res, 403);
 
     const pageSize = 15;
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);

@@ -2,255 +2,289 @@
 {{ block "head" }}
     <link rel="stylesheet" href="/css/dashboard.css">
 {{/block}}
+
 {{block "content"}}
-    <div class="page-header">
-        <div>
-            <h1>Overview</h1>
-        </div>
+<div class="page-header">
+  <div>
+    <h1>Overview</h1>
+  </div>
+</div>
+
+<section class="grid-2">
+  <div class="dash-col">
+    <div class="panel upcoming-panel">
+      <div class="panel-header">
+        <h2>Upcoming Events (5 at most)</h2>
+        <button class="btn ghost small" onclick="window.location.href='/dashboard/events'">View all</button>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Date and time</th>
+            <th>Booked / Capacity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ if events && events.length }}
+            {{each events as event}}
+              <tr>
+                <td><%- event.name %></td>
+                <td><%- event.dateStr %> <%- event.timeStr %></td>
+                <td><%- event.booked %> / <%- event.capacity %></td>
+                <% if (event.status == 'scheduled') { %>
+                  <td><span class="status-pill blue">Scheduled</span></td>
+                <% } else if (event.status == 'ongoing') { %>
+                  <td><span class="status-pill green">Ongoing</span></td>
+                <% } else if (event.status == 'completed') { %>
+                  <td><span class="status-pill gray">Completed</span></td>
+                <% } else if (event.status == 'postponed') { %>
+                  <td><span class="status-pill orange">Postponed</span></td>
+                <% } else if (event.status == 'cancelled') { %>
+                  <td><span class="status-pill red">Cancelled</span></td>
+                <% } %>
+              </tr>
+            {{/each}}
+          {{ else }}
+            <tr>
+              <td colspan="4" style="text-align:center; padding:16px; color: rgba(226,232,240,.7);">
+                No upcoming events found. View all to see past events.
+              </td>
+            </tr>
+          {{/if}}
+        </tbody>
+      </table>
     </div>
 
-    <section class="grid-2">
-        <div class="panel upcoming-panel">
-            <div class="panel-header">
-                <h2>Upcoming Events (5 at most)</h2>
-                <button class="btn ghost small" onclick="window.location.href='/dashboard/events'">View all</button>
+    <div class="panel panel-compact">
+      <div class="panel-header" style="display:flex; align-items:center; justify-content:space-between;">
+        <h2>Venues (3 at most)</h2>
+        <button class="btn ghost small" onclick="window.location.href='/dashboard/venues'">View all</button>
+      </div>
+
+      {{if venues && venues.length}}
+        <div style="display:flex; flex-direction:column; gap:10px; padding-top:6px;">
+          {{each venues as v}}
+            <div style="
+              display:flex; justify-content:space-between; align-items:center;
+              padding:10px 12px;
+              border:1px solid rgba(148,163,184,.12);
+              border-radius:12px;
+              background: rgba(2,6,23,.30);
+            ">
+              <div style="min-width:0;">
+                <div style="font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  <%- v.name %>
+                </div>
+                <div class="muted" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  <%- v.location %>
+                </div>
+              </div>
+              <span class="pill" style="flex-shrink:0;">Cap: <%- v.capacity %></span>
             </div>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Event</th>
-                    <th>Date and time</th>
-                    <th>Booked / Capacity</th>
-                    <th>Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ if events && events.length }}
-                    {{each events as event}}
-                    <tr>
-                        <td><%- event.name %></td>
-                        <td><%- event.dateStr %> <%- event.timeStr %></td>
-                        <td><%- event.booked %> / <%- event.capacity %></td>
-                        <% if (event.status == 'scheduled') { %>
-                            <td><span class="status-pill blue">Scheduled</span></td>
-                        <% } else if (event.status == 'ongoing') { %>
-                            <td><span class="status-pill green">Ongoing</span></td>
-                        <% } else if (event.status == 'completed') { %>
-                            <td><span class="status-pill gray">Completed</span></td>
-                        <% } else if (event.status == 'postponed') { %>
-                            <td><span class="status-pill orange">Postponed</span></td>
-                        <% } else if (event.status == 'cancelled') { %>
-                            <td><span class="status-pill red">Cancelled</span></td>
-                        <% } %>
-                    </tr>
-                    {{/each}}
-                {{ else }}
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 16px; color: rgba(226,232,240,.7);">
-                            No upcoming events found. View all to see past events.
-                        </td>
-                    </tr>
-                {{/if}}
-                </tbody>
-            </table>
+          {{/each}}
         </div>
-        
-        <div class="panel">
-            <div class="panel-header calendar-head">
-                <h2>Calendar</h2>
-
-                <div class="calendar-controls">
-                <button type="button" class="btn ghost small" id="cal-prev">‹</button>
-                <div class="calendar-title" id="cal-title">Month YYYY</div>
-                <button type="button" class="btn ghost small" id="cal-next">›</button>
-                </div>
-            </div>
-
-            <div class="calendar">
-                <div class="cal-weekdays">
-                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
-                </div>
-
-                <div class="cal-grid" id="cal-grid"></div>
-
-                <div class="cal-agenda">
-                <div class="cal-agenda-title" id="cal-agenda-title">Select a day</div>
-                <div class="cal-agenda-list" id="cal-agenda-list">
-                    <div class="muted">No day selected.</div>
-                </div>
-                </div>
-            </div>
+      {{else}}
+        <div class="muted" style="padding-top:8px;">
+          No venues created yet. Go to <b>Venues</b> to add one.
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-            var calTitle = document.getElementById("cal-title");
-            var calGrid = document.getElementById("cal-grid");
-            var prevBtn = document.getElementById("cal-prev");
-            var nextBtn = document.getElementById("cal-next");
-            var agendaTitle = document.getElementById("cal-agenda-title");
-            var agendaList = document.getElementById("cal-agenda-list");
+      {{/if}}
+    </div>
 
-            function pad2(n){ return (n < 10 ? "0" : "") + n; }
-            function keyOfDate(d){
-                return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
-            }
-            function monthName(i){
-                return ["January","February","March","April","May","June","July","August","September","October","November","December"][i];
-            }
-            function timeHHMM(d){
-                return pad2(d.getHours()) + ":" + pad2(d.getMinutes());
-            }
+  </div>
 
-            var eventsByDay = {};
+  <!-- RIGHT COLUMN (Calendar) -->
+  <div class="panel">
+    <div class="panel-header calendar-head">
+      <h2>Calendar</h2>
 
-            function loadEvents(){
-                return fetch("/api/events", { credentials: "same-origin" })
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    eventsByDay = {};
-                    var arr = (data && data.events) ? data.events : [];
+      <div class="calendar-controls">
+        <button type="button" class="btn ghost small" id="cal-prev">‹</button>
+        <div class="calendar-title" id="cal-title">Month YYYY</div>
+        <button type="button" class="btn ghost small" id="cal-next">›</button>
+      </div>
+    </div>
 
-                    arr.forEach(function(ev){
-                    if (!ev || ev.date == null) return; // skip null dates
+    <div class="calendar">
+      <div class="cal-weekdays">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+      </div>
 
-                    var dt = new Date(Number(ev.date));
-                    if (isNaN(dt.getTime())) return;
+      <div class="cal-grid" id="cal-grid"></div>
 
-                    var k = keyOfDate(dt);
-                    if (!eventsByDay[k]) eventsByDay[k] = [];
+      <div class="cal-agenda">
+        <div class="cal-agenda-title" id="cal-agenda-title">Select a day</div>
+        <div class="cal-agenda-list" id="cal-agenda-list">
+          <div class="muted">No day selected.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-                    eventsByDay[k].push({
-                        id: ev.id,
-                        name: ev.name || "Untitled",
-                        dateObj: dt,
-                        booked: ev.booked,
-                        capacity: ev.capacity,
-                        status: ev.status
-                    });
-                    });
+<!-- IMPORTANT: script is OUTSIDE grid-2 so it doesn't become a grid item -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var calTitle = document.getElementById("cal-title");
+  var calGrid = document.getElementById("cal-grid");
+  var prevBtn = document.getElementById("cal-prev");
+  var nextBtn = document.getElementById("cal-next");
+  var agendaTitle = document.getElementById("cal-agenda-title");
+  var agendaList = document.getElementById("cal-agenda-list");
 
-                    Object.keys(eventsByDay).forEach(function(k){
-                    eventsByDay[k].sort(function(a,b){ return a.dateObj - b.dateObj; });
-                    });
-                })
-                .catch(function(){
-                    eventsByDay = {};
-                });
-            }
+  function pad2(n){ return (n < 10 ? "0" : "") + n; }
+  function keyOfDate(d){
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+  function monthName(i){
+    return ["January","February","March","April","May","June","July","August","September","October","November","December"][i];
+  }
+  function timeHHMM(d){
+    return pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  }
 
-            var view = new Date();
-            view.setDate(1);
+  var eventsByDay = {};
 
-            function mondayIndex(jsDay){
-                return (jsDay + 6) % 7;
-            }
+  function loadEvents(){
+    return fetch("/api/events", { credentials: "same-origin" })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        eventsByDay = {};
+        var arr = (data && data.events) ? data.events : [];
 
-            function renderAgenda(d){
-                var k = keyOfDate(d);
-                agendaTitle.textContent = d.getDate() + " " + monthName(d.getMonth()) + " " + d.getFullYear();
+        arr.forEach(function(ev){
+          if (!ev || ev.date == null) return;
+          var dt = new Date(Number(ev.date));
+          if (isNaN(dt.getTime())) return;
 
-                var list = eventsByDay[k] || [];
-                if (!list.length){
-                agendaList.innerHTML = '<div class="muted">No events on this day.</div>';
-                return;
-                }
+          var k = keyOfDate(dt);
+          if (!eventsByDay[k]) eventsByDay[k] = [];
+          eventsByDay[k].push({
+            id: ev.id,
+            name: ev.name || "Untitled",
+            dateObj: dt,
+            booked: ev.booked,
+            capacity: ev.capacity,
+            status: ev.status
+          });
+        });
 
-                var html = "";
-                list.forEach(function(ev){
-                html += (
-                    '<div class="agenda-item">' +
-                    '<div class="agenda-main">' +
-                        '<div class="agenda-name">' + escapeHtml(ev.name) + '</div>' +
-                        '<div class="agenda-meta">' +
-                        timeHHMM(ev.dateObj) +
-                        (ev.status ? (' · ' + escapeHtml(ev.status)) : '') +
-                        (ev.capacity != null ? (' · ' + (ev.booked || 0) + '/' + ev.capacity) : '') +
-                        '</div>' +
-                    '</div>' +
-                    '</div>'
-                );
-                });
-                agendaList.innerHTML = html;
-            }
+        Object.keys(eventsByDay).forEach(function(k){
+          eventsByDay[k].sort(function(a,b){ return a.dateObj - b.dateObj; });
+        });
+      })
+      .catch(function(){ eventsByDay = {}; });
+  }
 
-            function escapeHtml(s){
-                s = String(s);
-                return s
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-            }
+  var view = new Date();
+  view.setDate(1);
 
-            function renderCalendar(){
-                calTitle.textContent = monthName(view.getMonth()) + " " + view.getFullYear();
-                calGrid.innerHTML = "";
+  function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
 
-                var first = new Date(view.getFullYear(), view.getMonth(), 1);
-                var startOffset = mondayIndex(first.getDay()); // how many days to go back to reach Monday
+  function escapeHtml(s){
+    s = String(s);
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-                var start = new Date(first);
-                start.setDate(first.getDate() - startOffset);
+  function renderAgenda(d){
+    var k = keyOfDate(d);
+    agendaTitle.textContent = d.getDate() + " " + monthName(d.getMonth()) + " " + d.getFullYear();
 
-                var today = new Date();
-                var todayKey = keyOfDate(today);
+    var list = eventsByDay[k] || [];
+    if (!list.length){
+      agendaList.innerHTML = '<div class="muted">No events on this day.</div>';
+      return;
+    }
 
-                for (var i = 0; i < 42; i++){
-                var d = new Date(start);
-                d.setDate(start.getDate() + i);
+    var html = "";
+    list.forEach(function(ev){
+      html += (
+        '<div class="agenda-item">' +
+          '<div class="agenda-main">' +
+            '<div class="agenda-name">' + escapeHtml(ev.name) + '</div>' +
+            '<div class="agenda-meta">' +
+              timeHHMM(ev.dateObj) +
+              (ev.status ? (' · ' + escapeHtml(ev.status)) : '') +
+              (ev.capacity != null ? (' · ' + (ev.booked || 0) + '/' + ev.capacity) : '') +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+    agendaList.innerHTML = html;
+  }
 
-                var k = keyOfDate(d);
-                var inMonth = (d.getMonth() === view.getMonth());
-                var hasEvents = !!(eventsByDay[k] && eventsByDay[k].length);
+  function renderCalendar(){
+    calTitle.textContent = monthName(view.getMonth()) + " " + view.getFullYear();
+    calGrid.innerHTML = "";
 
-                var cell = document.createElement("button");
-                cell.type = "button";
-                cell.className = "cal-cell" +
-                    (inMonth ? "" : " is-out") +
-                    (k === todayKey ? " is-today" : "") +
-                    (hasEvents ? " has-events" : "");
+    var first = new Date(view.getFullYear(), view.getMonth(), 1);
+    var startOffset = mondayIndex(first.getDay());
 
-                cell.setAttribute("data-key", k);
-                cell.innerHTML =
-                    '<div class="cal-daynum">' + d.getDate() + '</div>' +
-                    (hasEvents ? ('<div class="cal-dot" title="' + eventsByDay[k].length + ' event(s)"></div>') : '');
+    var start = new Date(first);
+    start.setDate(first.getDate() - startOffset);
 
-                cell.addEventListener("click", (function(dateCopy){
-                    return function(){
-                    var prev = calGrid.querySelector(".cal-cell.is-selected");
-                    if (prev) prev.classList.remove("is-selected");
-                    this.classList.add("is-selected");
+    var today = new Date();
+    var todayKey = keyOfDate(today);
 
-                    renderAgenda(dateCopy);
-                    };
-                })(d));
+    for (var i = 0; i < 42; i++){
+      var d = new Date(start);
+      d.setDate(start.getDate() + i);
 
-                calGrid.appendChild(cell);
-                }
-            }
+      var k = keyOfDate(d);
+      var inMonth = (d.getMonth() === view.getMonth());
+      var hasEvents = !!(eventsByDay[k] && eventsByDay[k].length);
 
-            prevBtn.addEventListener("click", function(){
-                view.setMonth(view.getMonth() - 1);
-                view.setDate(1);
-                renderCalendar();
-            });
+      var cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "cal-cell" +
+        (inMonth ? "" : " is-out") +
+        (k === todayKey ? " is-today" : "") +
+        (hasEvents ? " has-events" : "");
 
-            nextBtn.addEventListener("click", function(){
-                view.setMonth(view.getMonth() + 1);
-                view.setDate(1);
-                renderCalendar();
-            });
+      cell.setAttribute("data-key", k);
+      cell.innerHTML =
+        '<div class="cal-daynum">' + d.getDate() + '</div>' +
+        (hasEvents ? ('<div class="cal-dot" title="' + eventsByDay[k].length + ' event(s)"></div>') : '');
 
-            loadEvents().then(function(){
-                renderCalendar();
+      cell.addEventListener("click", (function(dateCopy){
+        return function(){
+          var prev = calGrid.querySelector(".cal-cell.is-selected");
+          if (prev) prev.classList.remove("is-selected");
+          this.classList.add("is-selected");
+          renderAgenda(dateCopy);
+        };
+      })(d));
 
+      calGrid.appendChild(cell);
+    }
+  }
 
-                var tk = keyOfDate(new Date());
-                var btn = calGrid.querySelector('.cal-cell[data-key="' + tk + '"]');
-                if (btn) btn.click();
-            });
-            });
-        </script>
-    </section>
+  prevBtn.addEventListener("click", function(){
+    view.setMonth(view.getMonth() - 1);
+    view.setDate(1);
+    renderCalendar();
+  });
+
+  nextBtn.addEventListener("click", function(){
+    view.setMonth(view.getMonth() + 1);
+    view.setDate(1);
+    renderCalendar();
+  });
+
+  loadEvents().then(function(){
+    renderCalendar();
+    var tk = keyOfDate(new Date());
+    var btn = calGrid.querySelector('.cal-cell[data-key="' + tk + '"]');
+    if (btn) btn.click();
+  });
+});
+</script>
 {{/block}}

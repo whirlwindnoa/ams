@@ -28,14 +28,6 @@
                 <input id="password" name="password" type="password" placeholder="••••••••" required>
             </div>
 
-            <div class="form-row-between">
-                <label class="checkbox">
-                    <input type="checkbox" name="remember">
-                    <span>Remember me</span>
-                </label>
-                <a href="#" class="link-muted">Forgot password?</a>
-            </div>
-
             <button type="submit" class="btn primary full">Login</button>
         </form>
 

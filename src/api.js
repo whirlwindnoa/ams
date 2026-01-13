@@ -28,11 +28,12 @@ async function refreshUserCacheForUserId(userId) {
   }
 }
 
-// venue management stuff  including file uplaod 
+// venue management stuff  including file uplaod
+// only for managers and superusers
 router.post('/venues/create', venueUpload.single('image'), async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-    if (req.user.elevation < 3) return res.status(403).json({ error: 'Insufficient permissions' });
+    if (req.user.elevation < 2) return res.status(403).json({ error: 'Requires Manager or Administrator to delete a venue.' });
 
     const { name, location, capacity } = req.body || {};
     const cap = Number(capacity);
@@ -68,7 +69,7 @@ router.post('/venues/create', venueUpload.single('image'), async (req, res) => {
 router.post('/venues/:id/delete', async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-    if (req.user.elevation < 2) return res.status(403).json({ error: 'Admins only' });
+    if (req.user.elevation < 2) return res.status(403).json({ error: 'Requires Manager or Administrator to delete a venue.' });
 
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) {
@@ -100,11 +101,14 @@ router.post('/venues/:id/delete', async (req, res) => {
 });
 
 // USER MANAGEMENT ROUTES!!!!!!!!!!!!!!!!!!!!!!!!!!
+// onyl administrator can do this
+// managers can only view this pages, but can't do anything on it
 router.delete('/users/:id', express.urlencoded({ extended: false }), async (req, res) => {
   try {
-    if (!req.user || req.user.elevation < 2) {
-      return res.status(401).json({ error: 'Authentication required' });
+    if (!req.user || req.user.elevation != 3) {
+      return res.status(401).json({ error: 'Requires Administrator to manage users.' });
     }
+    console.log(req.params.id, req.user.id);
     if (req.user.id === Number(req.params.id)) {
       return res.status(400).json({ error: 'You cannot delete your own account' });
     }
@@ -127,8 +131,8 @@ router.delete('/users/:id', express.urlencoded({ extended: false }), async (req,
 
 router.post('/users/:id/promote', express.urlencoded({ extended: false }), async (req, res) => {
   try {
-    if (!req.user || req.user.elevation < 2) {
-      return res.status(401).json({ error: 'Authentication required' });
+    if (!req.user || req.user.elevation != 3) {
+      return res.status(401).json({ error: 'Requires Administrator to manage users.' });
     }
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid id' });
@@ -156,8 +160,8 @@ router.post('/users/:id/promote', express.urlencoded({ extended: false }), async
 
 router.post('/users/:id/demote', express.urlencoded({ extended: false }), async (req, res) => {
   try {
-    if (!req.user || req.user.elevation < 2) {
-      return res.status(401).json({ error: 'Authentication required' });
+    if (!req.user || req.user.elevation != 3) {
+      return res.status(401).json({ error: 'Requires Administrator to manage users.' });
     }
 
     const id = Number(req.params.id);
@@ -187,6 +191,9 @@ router.post('/users/:id/demote', express.urlencoded({ extended: false }), async 
 });
 
 // EVENT API ROUTES!!!!!!!!!!!!!!!!!!!!!!!!!!
+// all approved users (staff+) can create events, but they can only edit/delete their own events.
+// only managers and admins can delete events created by others
+
 // all events
 router.get('/events', async (req, res) => {
 	try {
@@ -277,8 +284,8 @@ router.delete('/events/:id', express.urlencoded({ extended: false }), async (req
 		if (!ev) return res.status(404).json({ error: 'Event not found' });
 
 		// allow deletion if admin/staff or creator
-		if (!(req.user.elevation == 2 || req.user.id === ev.added_by)) {
-			return res.status(403).json({ error: 'Insufficient permissions' });
+		if (!(req.user.elevation > 1 || req.user.id === ev.added_by)) {
+			return res.status(403).json({ error: 'Requires Manager or Administrator to delete an event created by another user.' });
 		}
 
 		await db.run('DELETE FROM events WHERE id = ?', [id]);
@@ -302,8 +309,8 @@ router.post('/events/:id/edit', express.urlencoded({ extended: false }), async (
 		if (!ev) return res.status(404).json({ error: 'Event not found' });
 
 		// allow editing if admin/staff or creator
-		if (!(req.user.elevation == 2 || req.user.id === ev.added_by)) {
-			return res.status(403).json({ error: 'Insufficient permissions' });
+		if (!(req.user.elevation > 1 || req.user.id === ev.added_by)) {
+			return res.status(403).json({ error: 'Requires Manager or Administrator to edit an event created by another user.' });
 		}
 
     const { name, date, time, booked, status, capacity, venue } = req.body || {};

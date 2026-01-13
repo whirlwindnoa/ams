@@ -55,7 +55,7 @@ class Database {
                 status TEXT NOT NULL,
                 added_by INTEGER NOT NULL,
                 venue INTEGER,
-                FOREIGN KEY (venue) REFERENCES venues(id) ON DELETE CASCADE,
+                FOREIGN KEY (venue) REFERENCES venues(id) ON DELETE NO ACTION,
                 FOREIGN KEY (added_by) REFERENCES users(id) ON DELETE CASCADE
             )`
         );
