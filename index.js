@@ -70,6 +70,21 @@ app.use(async (req, res, next) => { // on every request to the server
     next();
 });
 
+app.use((req, res, next) => {
+  const allow = [
+    '/api/auth/logout',
+    '/unapproved'
+  ];
+
+  if (req.path.startsWith('/public')) return next();
+
+  if (req.user && req.user.elevation === 0 && !allow.includes(req.path)) {
+    return res.redirect('/unapproved');
+  }
+
+  next();
+});
+
 app.use('/api/auth', authRouter); // routing to auth related endpoints
 app.use('/api', featuresRouter); // routing to feature related endpoints
 app.use(portalRouter); // routing to render pages

@@ -25,12 +25,15 @@ class Database {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                elevation INTEGER NOT NULL DEFAULT 0 CHECK (elevation IN (0, 1, 2)),
+                elevation INTEGER NOT NULL DEFAULT 0 CHECK (elevation IN (0, 1, 2, 3)),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );`
         )
         .then(async () => {
-            // whatever, make it add admin user with id 1 later
+            const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@admin.com';
+            const adminPassword = process.env.ADMIN_PASSWORD ?? 'Admin123';
+
+            await this.run('INSERT OR IGNORE INTO users (email, password, elevation, created_at) VALUES (?, ?, 3, ?)', [adminEmail, adminPassword, Date.now()]);
         });
 
         this.run(
@@ -52,7 +55,28 @@ class Database {
                 status TEXT NOT NULL,
                 notes TEXT,
                 added_by INTEGER NOT NULL,
+                venue INTEGER,
+                FOREIGN KEY (venue) REFERENCES venues(id) ON DELETE CASCADE,
                 FOREIGN KEY (added_by) REFERENCES users(id) ON DELETE CASCADE
+            )`
+        );
+
+        this.run(
+            `CREATE TABLE IF NOT EXISTS venues (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                location TEXT NOT NULL,
+                capacity INTEGER NOT NULL
+            )`
+        );
+
+        this.run(
+            `CREATE TABLE IF NOT EXISTS audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
             )`
         );
 

@@ -1,0 +1,127 @@
+{{extend "./dashboard_layout.art"}}
+{{block "content"}}
+    <style>
+        .stretch-horizontal {
+            grid-column: 1 / -1;
+        }
+        .table-wrapper {
+            overflow: auto;
+            padding-top: 0.25rem;
+        }
+
+        .btn-action {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-action.promote {
+            background: rgba(62, 255, 78, 0.15);
+            color: #9dff80;
+        }
+        .btn-action.demote {
+            background: rgba(255, 200, 49, 0.15);
+            color: #fff34f;
+        }
+        .btn-action.delete {
+            background: rgba(239,68,68,.15);
+            color: #f87171;
+        }
+
+        .btn-action:hover {
+            filter: brightness(1.15);
+        }
+    </style>
+    <div class="page-header">
+        <div>
+            <h1>List of users</h1>
+            <p class="muted"></p>
+        </div>
+    </div>
+
+    <section class="grid-2">
+        <div class="panel stretch-horizontal">
+            <div class="panel-header">
+                <h2>Event list</h2>
+            </div>
+
+            <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>E-mail</th>
+                    <th>Created on</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{each users as user}}
+                <tr>
+                    <td><%- user.id %></td>
+                    <td><%- user.email %></td>
+                    <td><%- user.dateStr %> <%- user.timeStr %></td>
+                    <% if (user.elevation == 0) user.status = "Unapproved"; %>
+                    <% if (user.elevation == 1) user.status = "Staff"; %>
+                    <% if (user.elevation == 2) user.status = "Manager"; %>
+                    <% if (user.elevation == 3) user.status = "Administrator"; %>
+                    <td><%- user.status %></td>
+                    <td class="actions">
+                        <button class="btn-action promote" onclick="promoteUser(<%- user.id %>)">Promote</button>
+                        <button class="btn-action demote" onclick="demoteUser(<%- user.id %>)">Demote</button>
+                        <button class="btn-action delete" onclick="deleteUser(<%- user.id %>)">Delete</button>
+                    </td>
+                </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </section>
+    <script>
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            fetch(`/api/users/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) location.reload();
+                    else alert('You cannot delete your own account.');
+                });
+            }
+        }
+
+        function demoteUser(id) {
+            fetch(`/api/users/${id}/demote`, { method: 'POST' })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Something went wrong.');
+                    }
+
+                    location.reload();
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
+        }
+        
+        function promoteUser(id) {
+            fetch(`/api/users/${id}/promote`, { method: 'POST' })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Something went wrong.');
+                    }
+
+                    location.reload();
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
+        }
+    </script>
+{{/block}}

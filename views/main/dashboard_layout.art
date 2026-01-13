@@ -5,6 +5,9 @@
     <title>AMS - {{ title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    {{ block "head" }}
+    {{/block}}
 </head>
 <body>
 <header class="topbar">
@@ -15,10 +18,11 @@
         <input type="text" class="search" placeholder="Search events, bookings...">
         <div class="user">
             <span class="user-name">{{ user.email }} </span> |
-            <% if (user.elevation == 0) user.elevation = "Visitor"; %>
-            <% if (user.elevation == 1) user.elevation = "Staff"; %>
-            <% if (user.elevation == 2) user.elevation = "Administrator"; %>
-            <span class="user-name">{{ user.elevation }} </span>
+            <% if (user.elevation == 0) user.status = "Unapproved"; %>
+            <% if (user.elevation == 1) user.status = "Staff"; %>
+            <% if (user.elevation == 2) user.status = "Manager"; %>
+            <% if (user.elevation == 3) user.status = "Administrator"; %>
+            <span class="user-name">{{ user.status }} </span>
             <a href="/api/auth/logout" class="btn small ghost logout-btn">Sign Out</a>
         </div>
         
@@ -28,8 +32,12 @@
 <div class="layout">
     <nav class="sidebar">
         <ul>
-            <li class="sidebar-section">Main</li>
+            <li class="sidebar-section">Management</li>
+            <li><a href="/dashboard">Dashboard</a></li>
             <li><a href="/dashboard/events">Events</a></li>
+            <li class="sidebar-section">Administration</li>
+            <li><a href="/dashboard/users">Users</a></li>
+            <li><a href="/dashboard/log">Audit Log</a></li>
         </ul>
     </nav>
 

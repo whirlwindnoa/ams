@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AMS - Unapproved</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+<div class="hero">
+    <div class="panel">
+        <h1 class="title">You have successfully registered.</h1>
+        <p class="subtitle">However, your account is currently unapproved and awaiting administrator review. Sign in again once your account has been approved.</p>
+
+        <div class="buttons">
+            <% if (referer) { %>
+                <a href="<%- referer %>" class="btn primary">Go back</a>
+            <% } %>
+            <a href="/api/auth/logout" class="btn ghost">Sign out</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

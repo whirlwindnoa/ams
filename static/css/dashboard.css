@@ -1,0 +1,166 @@
+.calendar-head {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-title {
+  min-width: 160px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.calendar {
+  display: grid;
+  gap: 12px;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.cal-weekdays > div {
+  padding: 6px 8px;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.cal-cell {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 10px;
+  min-height: 54px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .06s ease, background .15s ease, border-color .15s ease;
+  position: relative;
+}
+
+.cal-cell:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.14);
+}
+
+.cal-cell.is-out {
+  opacity: 0.45;
+}
+
+.cal-cell.is-today {
+  border-color: rgba(255,255,255,0.28);
+}
+
+.cal-cell.is-selected {
+  outline: 2px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.06);
+}
+
+.cal-daynum {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.cal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: currentColor;
+  opacity: 0.9;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.cal-agenda {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 12px;
+}
+
+.cal-agenda-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.agenda-item {
+  padding: 10px 10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 8px;
+}
+
+.agenda-name {
+  font-weight: 650;
+}
+
+.agenda-meta {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 3px;
+}
+
+.cal-cell{
+  color: inherit;
+}
+
+.calendar,
+.cal-weekdays,
+.calendar-title,
+.cal-agenda,
+.cal-agenda *{
+  color: rgba(255,255,255,0.92);
+}
+
+.cal-weekdays{
+  opacity: 1;
+  color: rgba(255,255,255,0.70);
+}
+
+.cal-cell.is-out{
+  opacity: 0.35;
+}
+
+/* ===== Upcoming Events: fixed height for 5 rows ===== */
+.upcoming-panel{
+  height: 300px;              /* adjust once to match your UI */
+  display: flex;
+  flex-direction: column;
+}
+
+.upcoming-panel .table{
+  flex: 1;
+}
+
+/* table header stays, body scrolls (or stays empty space) */
+.upcoming-panel .table tbody{
+  display: block;
+  height: calc(5 * 56px);     /* 5 rows */
+  overflow: hidden;           /* change to auto if you want scroll */
+}
+
+.upcoming-panel .table thead,
+.upcoming-panel .table tbody tr{
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.upcoming-panel .table tbody tr{
+  height: 35px;               /* row height */
+}
