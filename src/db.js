@@ -53,7 +53,6 @@ class Database {
                 booked INTEGER NOT NULL DEFAULT 0,
                 capacity INTEGER NOT NULL,
                 status TEXT NOT NULL,
-                notes TEXT,
                 added_by INTEGER NOT NULL,
                 venue INTEGER,
                 FOREIGN KEY (venue) REFERENCES venues(id) ON DELETE CASCADE,

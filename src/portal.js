@@ -60,6 +60,13 @@ router.get('/dashboard', async (req, res) => {
         LIMIT 5
     `, [now]);
 
+    const venues = await db.all(`
+        SELECT id, name, location, capacity, image
+        FROM venues
+        ORDER BY id DESC
+        LIMIT 5
+    `); 
+
     events.forEach(ev => {
         const d = new Date(ev.date);
 
@@ -76,6 +83,7 @@ router.get('/dashboard', async (req, res) => {
     res.render('main/dashboard.art', {
         title: 'Dashboard',
         events,
+        venues,
         user: req.user
     });
 });
@@ -85,10 +93,18 @@ router.get('/dashboard/events', async (req, res) => {
     const events = await db.all(`
         SELECT
             events.*,
-            users.email AS added_by_email
+            users.email AS added_by_email,
+            venues.name AS venue_name
         FROM events
         JOIN users ON users.id = events.added_by
+        LEFT JOIN venues ON venues.id = events.venue
         ORDER BY events.date IS NULL, events.date ASC
+    `);
+
+    const venues = await db.all(`
+        SELECT id, name
+        FROM venues
+        ORDER BY name ASC
     `);
 
     events.forEach(ev => {
@@ -109,7 +125,8 @@ router.get('/dashboard/events', async (req, res) => {
     res.render('main/events.art', {
         title: 'Events',
         user: req.user,
-        events
+        events,
+        venues
     });
 });
 

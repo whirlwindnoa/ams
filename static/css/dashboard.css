@@ -150,7 +150,7 @@
 /* table header stays, body scrolls (or stays empty space) */
 .upcoming-panel .table tbody{
   display: block;
-  height: calc(5 * 56px);     /* 5 rows */
+  height: calc(5 * 40px);     /* 5 rows */
   overflow: hidden;           /* change to auto if you want scroll */
 }
 
@@ -164,3 +164,28 @@
 .upcoming-panel .table tbody tr{
   height: 35px;               /* row height */
 }
+
+.panel-compact {
+  padding: 12px 14px;        /* smaller padding */
+}
+
+.panel-compact .panel-header {
+  margin-bottom: 8px;        /* tighter header */
+}
+
+.panel-compact .empty {
+  padding: 8px 0;            /* reduce empty message spacing */
+  margin: 0;
+}
+
+.panel-compact {
+  min-height: unset !important;
+  height: auto !important;
+}
+
+.panel-compact {
+  background: rgba(2,6,23,.35);
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 14px;
+}
+

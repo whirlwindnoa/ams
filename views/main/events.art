@@ -58,10 +58,15 @@
                     <label for="ev-cap">Capacity*</label>
                     <input id="ev-cap" name="capacity" type="number" min="1" placeholder="Capacity" axlength="4" required>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="ev-notes">Notes / Venue</label>
-                    <input id="ev-notes" name="notes" type="text" placeholder="Venue or notes">
+                    <label for="ev-venue">Venue*</label>
+                    <select id="ev-venue" name="venue" required>
+                        <option value="">Select venue</option>
+                        {{each venues as v}}
+                            <option value="<%- v.id %>"><%- v.name %></option>
+                        {{/each}}
+                    </select>
                 </div>
 
                 <div class="modal-actions">
@@ -121,8 +126,13 @@
             </div>
 
             <div class="form-group">
-                <label for="edit-ev-notes">Notes / Venue</label>
-                <input id="edit-ev-notes" name="notes" type="text" placeholder="Venue or notes">
+                <label for="edit-ev-venue">Venue*</label>
+                <select id="edit-ev-venue" name="venue" required>
+                    <option value="">Select venue</option>
+                    {{each venues as v}}
+                        <option value="<%- v.id %>"><%- v.name %></option>
+                    {{/each}}
+                </select>
             </div>
 
             <div class="modal-actions">
@@ -148,6 +158,7 @@
                     <th>Created by</th>
                     <th>Booked / Capacity</th>
                     <th>Status</th>
+                    <th>Venue</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -170,18 +181,19 @@
                         <% } else if (event.status == 'cancelled') { %>
                             <td><span class="status-pill red">Cancelled</span></td>
                         <% } %>
+                        <td><%- event.venue_name %></td>
                         <td class="actions">
                             <button
-                            class="btn-action edit"
-                            data-id="<%- event.id %>"
-                            data-name="<%- event.name %>"
-                            data-date="<%- event.dateStr %>"
-                            data-time="<%- event.timeStr %>"
-                            data-booked="<%- event.booked %>"
-                            data-capacity="<%- event.capacity %>"
-                            data-notes="<%- event.notes || '' %>"
-                            data-status="<%- event.status %>"
-                            onclick="openEditModalFromButton(this)"
+                                class="btn-action edit"
+                                data-id="<%- event.id %>"
+                                data-name="<%- event.name %>"
+                                data-date="<%- event.dateStr %>"
+                                data-time="<%- event.timeStr %>"
+                                data-booked="<%- event.booked %>"
+                                data-capacity="<%- event.capacity %>"
+                                data-status="<%- event.status %>"
+                                data-venue="<%- event.venue || '' %>"
+                                onclick="openEditModalFromButton(this)"
                             >
                             Edit
                             </button>
@@ -210,12 +222,12 @@
                 btn.dataset.time,
                 btn.dataset.booked,
                 btn.dataset.capacity,
-                btn.dataset.notes,
+                btn.dataset.venue,
                 btn.dataset.status
             );
         };
 
-        window.openEditModal = function(id, name, date, time, booked, capacity, notes, status) {
+        window.openEditModal = function(id, name, date, time, booked, capacity, venue, status) {
             const editModal = document.getElementById('edit-event-modal');
             const editForm = document.getElementById('edit-event-form');
 
@@ -227,7 +239,7 @@
             document.getElementById('edit-ev-time').value = time || '';
             document.getElementById('edit-ev-booked').value = booked || 1;
             document.getElementById('edit-ev-cap').value = capacity || 1;
-            document.getElementById('edit-ev-notes').value = notes || '';
+            document.getElementById('edit-ev-venue').value = venue;
             document.getElementById('edit-ev-status').value = status || 'scheduled';
 
             editModal.classList.remove('hidden');
@@ -262,7 +274,7 @@
             const editCancelBtn = document.getElementById('edit-cancel-event');
             const editForm = document.getElementById('edit-event-form');
 
-            window.openEditModal = function(id, name, date, time, booked, capacity, notes, status) {
+            window.openEditModal = function(id, name, date, time, booked, capacity, venue, status) {
                 editForm.action = `/api/events/${id}/edit`;
 
                 document.getElementById('edit-ev-id').value = id;
@@ -271,8 +283,10 @@
                 document.getElementById('edit-ev-time').value = time || '';
                 document.getElementById('edit-ev-booked').value = booked || 1;
                 document.getElementById('edit-ev-cap').value = capacity || 1;
-                document.getElementById('edit-ev-notes').value = notes || '';
+                document.getElementById('edit-ev-venue').value = venue || '';
                 document.getElementById('edit-ev-status').value = status || 'scheduled';
+
+                console.log(venue);
 
                 editModal.classList.remove('hidden');
                 editModal.setAttribute('aria-hidden', 'false');

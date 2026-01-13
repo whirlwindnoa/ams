@@ -225,7 +225,7 @@ router.post('/events/add', express.urlencoded({ extended: false }), async (req, 
   try {
     if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
-    const { name, date, time, booked, status, capacity, notes } = req.body || {};
+    const { name, date, time, booked, status, capacity, venue } = req.body || {};
 
     if (!name || typeof name !== 'string' || name.trim().length < 3) {
       return res.status(400).json({ error: 'Invalid or missing name (min 3 chars)' });
@@ -254,7 +254,7 @@ router.post('/events/add', express.urlencoded({ extended: false }), async (req, 
       unixTime = ms;
     }
 
-    await db.run(`INSERT INTO events (name, date, booked, capacity, status, notes, added_by) VALUES (?, ?, ?, ?, ?, ?, ?)`,[name.trim(), unixTime, booked, cap, status, notes || null, req.user.id]);
+    await db.run(`INSERT INTO events (name, date, booked, capacity, status, venue, added_by) VALUES (?, ?, ?, ?, ?, ?, ?)`,[name.trim(), unixTime, booked, cap, status, venue, req.user.id]);
 
     await db.run('INSERT INTO audit_log (user_id, action) VALUES (?, ?)', [req.user.id, `Added event ${name}`]);
     return res.redirect('/dashboard/events');
@@ -306,7 +306,7 @@ router.post('/events/:id/edit', express.urlencoded({ extended: false }), async (
 			return res.status(403).json({ error: 'Insufficient permissions' });
 		}
 
-    const { name, date, time, booked, status, capacity, notes } = req.body || {};
+    const { name, date, time, booked, status, capacity, venue } = req.body || {};
 
     if (capacity > 9999) {
       return res.status(400).json({ error: 'You cannot have higher capacity than 9999' });
@@ -338,7 +338,7 @@ router.post('/events/:id/edit', express.urlencoded({ extended: false }), async (
       unixTime = ms;
     }
 
-    await db.run(`UPDATE events SET name = ?, date = ?, booked = ?, capacity = ?, status = ?, notes = ? WHERE id = ?`,[name.trim(), unixTime, booked, cap, status, notes || null, id]);
+    await db.run(`UPDATE events SET name = ?, date = ?, booked = ?, capacity = ?, status = ?, venue = ? WHERE id = ?`,[name.trim(), unixTime, booked, cap, status, venue, id]);
     await db.run('INSERT INTO audit_log (user_id, action) VALUES (?, ?)', [req.user.id, `Edited event ${ev.name} into ${name}`]);
     return res.redirect('/dashboard/events');
 	} catch (err) {
