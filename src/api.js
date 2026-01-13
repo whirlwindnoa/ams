@@ -2,6 +2,10 @@ import express from 'express';
 import db from './db.js';
 
 import { cookieCache } from './stores.js';
+import { venueUpload } from './upload.js';
+
+import fs from 'fs';
+import path from 'path';
 
 const router = express.Router();
 
@@ -10,8 +14,6 @@ const router = express.Router();
 // 1 - regular staff
 // 2 - admin/manager
 // 3 - superuser
-
-// USER MANAGEMENT ROUTES!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 async function refreshUserCacheForUserId(userId) {
   const fresh = await db.get('SELECT id, email, elevation FROM users WHERE id = ?', [userId]);
@@ -26,6 +28,78 @@ async function refreshUserCacheForUserId(userId) {
   }
 }
 
+// venue management stuff  including file uplaod 
+router.post('/venues/create', venueUpload.single('image'), async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+    if (req.user.elevation < 3) return res.status(403).json({ error: 'Insufficient permissions' });
+
+    const { name, location, capacity } = req.body || {};
+    const cap = Number(capacity);
+
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
+      return res.status(400).json({ error: 'Invalid venue name' });
+    }
+    if (!location || typeof location !== 'string' || location.trim().length < 2) {
+      return res.status(400).json({ error: 'Invalid venue location' });
+    }
+    if (!Number.isInteger(cap) || cap < 1) {
+      return res.status(400).json({ error: 'Invalid capacity' });
+    }
+
+    const imagePath = req.file ? `/uploads/venues/${req.file.filename}` : null;
+
+    await db.run(
+      `INSERT INTO venues (name, location, capacity, image) VALUES (?, ?, ?, ?)`,
+      [name.trim(), location.trim(), cap, imagePath]
+    );
+
+    const row = await db.get(`SELECT last_insert_rowid() AS id`);
+    const venue = await db.get(`SELECT * FROM venues WHERE id = ?`, [row.id]);
+
+    return res.json({ success: true, venue });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/venues/:id/delete', async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+    if (req.user.elevation < 2) return res.status(403).json({ error: 'Admins only' });
+
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: 'Invalid venue id' });
+    }
+
+    const venue = await db.get(`SELECT image FROM venues WHERE id = ?`, [id]);
+    if (!venue) {
+      return res.status(404).json({ error: 'Venue not found' });
+    }
+
+    if (venue.image) {
+      const imagePath = path.join(process.cwd(), 'static', venue.image);
+
+      fs.unlink(imagePath, err => {
+        if (err && err.code !== 'ENOENT') {
+          console.error('Failed to delete image:', err);
+        }
+      });
+    }
+
+    await db.run(`DELETE FROM venues WHERE id = ?`, [id]);
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// USER MANAGEMENT ROUTES!!!!!!!!!!!!!!!!!!!!!!!!!!
 router.delete('/users/:id', express.urlencoded({ extended: false }), async (req, res) => {
   try {
     if (!req.user || req.user.elevation < 2) {

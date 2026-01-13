@@ -1,0 +1,193 @@
+{{extend "./dashboard_layout.art"}}
+{{ block "head" }}
+    <link rel="stylesheet" href="/css/venues.css">
+{{/block}}
+{{block "content"}}
+<div class="page-header">
+  <div>
+    <h1>Venues</h1>
+    <p class="muted">Auditorium locations and capacities</p>
+  </div>
+
+  <button id="openVenueModal" class="btn primary" type="button">+ New Venue</button>
+</div>
+
+{{if venues && venues.length}}
+  <section class="venues-grid">
+    {{each venues venue}}
+      <div class="venue-card" onclick="location.href='/venues/<%- venue.id %>'">
+        <button class="venue-delete-btn" onclick="event.stopPropagation(); deleteVenue(<%- venue.id %>)">
+            ✕
+        </button>
+        {{if venue.image}}
+          <img src="<%- venue.image %>" class="venue-image" alt="Venue image">
+        {{/if}}
+
+        <div class="venue-name"><%- venue.name %></div>
+
+        <div class="venue-meta">
+          <span class="pill"><%- venue.location %></span>
+          <span class="pill">Capacity: <%- venue.capacity %></span>
+        </div>
+      </div>
+    {{/each}}
+  </section>
+{{else}}
+  <div class="empty">
+    No venues created yet. Click <b>+ New Venue</b> to add one.
+  </div>
+{{/if}}
+    <div id="venueModal" class="modal hidden">
+    <div class="modal-backdrop" id="venueModalBackdrop"></div>
+
+    <div class="modal-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;">
+        <div>
+            <h3 style="margin:0;">New Venue</h3>
+            <p class="muted" style="margin:6px 0 0; font-size:12px;">Add a venue with optional image upload</p>
+        </div>
+        </div>
+
+        <form id="venueForm" class="form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Name*</label>
+            <input name="name" required minlength="2">
+        </div>
+
+        <div class="form-group">
+            <label>Location*</label>
+            <input name="location" required minlength="2">
+        </div>
+
+        <div class="form-group">
+            <label>Capacity*</label>
+            <input name="capacity" type="number" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label>Image (optional)</label>
+            <input name="image" type="file" accept="image/*">
+        </div>
+
+        <div id="venueErr" class="muted" style="display:none; color:#f87171; font-size:12px; margin-top:8px;"></div>
+
+        <div class="modal-actions" style="margin-top:14px;">
+            <button type="button" class="btn ghost" id="closeVenueModal">Cancel</button>
+            <button type="submit" class="btn primary" id="saveVenueBtn">Create Venue</button>
+        </div>
+        </form>
+    </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var openBtn = document.getElementById('openVenueModal');
+    var modal = document.getElementById('venueModal');
+    var backdrop = document.getElementById('venueModalBackdrop');
+    var closeBtn = document.getElementById('closeVenueModal');
+    var cancelBtn = document.getElementById('cancelVenueBtn');
+    var form = document.getElementById('venueForm');
+    var errBox = document.getElementById('venueErr');
+    var saveBtn = document.getElementById('saveVenueBtn');
+
+    function showErr(msg) {
+        if (!errBox) return;
+        errBox.style.display = 'block';
+        errBox.textContent = msg || 'Something went wrong';
+    }
+
+    function clearErr() {
+        if (!errBox) return;
+        errBox.style.display = 'none';
+        errBox.textContent = '';
+    }
+
+    function openModal() {
+        clearErr();
+        if (form) form.reset();
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        if (modal) modal.classList.add('hidden');
+    }
+
+    // Quick sanity log (remove later)
+    // console.log('venue elements:', { openBtn, modal, form, saveBtn });
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    if (!form) {
+        console.error('venueForm not found — submit handler not attached');
+        return;
+    }
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        clearErr();
+
+        // Prevent double-submit
+        if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Creating...';
+        }
+
+        try {
+        var fd = new FormData(form);
+
+        var res = await fetch('/api/venues/create', {
+            method: 'POST',
+            body: fd
+        });
+
+        // Handle non-JSON responses safely
+        var text = await res.text();
+        var data = null;
+        try {
+            data = JSON.parse(text);
+        } catch (_) {
+            // If server returned HTML or plain text, show it
+            throw new Error('Server did not return JSON. Status ' + res.status + ': ' + text.slice(0, 120));
+        }
+
+        if (!res.ok || !data || !data.success) {
+            throw new Error((data && data.error) ? data.error : 'Failed to create venue');
+        }
+
+        // Success: reload to show new venue
+        window.location.reload();
+        } catch (err) {
+        console.error(err);
+        showErr(err.message || 'Failed to create venue');
+        } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Create Venue';
+        }
+        }
+    });
+    });
+    </script>
+    <script>
+        function deleteVenue(id) {
+            if (!confirm('Delete this venue? This cannot be undone.')) return;
+
+            fetch('/api/venues/' + id + '/delete', {
+                method: 'POST'
+            })
+            .then(r => r.json())
+            .then(j => {
+                if (!j.success) throw new Error(j.error || 'Failed to delete venue');
+                window.location.reload();
+            })
+            .catch(err => alert(err.message));
+        }
+    </script>
+
+{{/block}}

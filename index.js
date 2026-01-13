@@ -15,14 +15,14 @@ import { cookieCache } from './src/stores.js';
 
 import portalRouter from './src/portal.js';
 import authRouter from './src/auth.js';
-import featuresRouter from './src/features.js';
+import apiRouter from './src/api.js';
 
 if(!fs.existsSync('.env')) {
     fs.copyFileSync('.env.template', '.env');
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -86,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', authRouter); // routing to auth related endpoints
-app.use('/api', featuresRouter); // routing to feature related endpoints
+app.use('/api', apiRouter); // routing to feature related endpoints
 app.use(portalRouter); // routing to render pages
 
 app.listen(process.env.PORT, () => {

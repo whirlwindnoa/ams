@@ -22,6 +22,24 @@ function signedInOnly(page, title) {
     }
 }
 
+router.get('/dashboard/venues', async (req, res) => {
+  if (!req.user) return res.redirect('/login');
+  if (req.user.elevation < 1) return error('You do not have permission to view this page.', req, res, 403);
+
+  const venues = await db.all(`
+    SELECT id, name, location, capacity, image
+    FROM venues
+    ORDER BY name ASC
+  `);
+
+  return res.render('main/venues.art', {
+    title: 'Venues',
+    user: req.user,
+    venues
+  });
+});
+
+
 // landing pages (unauthorized people)
 router.get('/login', signedOutOnly('login.art'));
 router.get('/register', signedOutOnly('register.art'));
@@ -128,11 +146,22 @@ router.get('/dashboard/users', async (req, res) => {
 });
 
 router.get('/dashboard/log', async (req, res) => {
-    if (!req.user) return res.redirect('/'); 
+    if (!req.user) return res.redirect('/');
     if (req.user.elevation < 1) return error('You do not have permission to view this page.', req, res, 403);
 
+    const pageSize = 15;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const offset = (page - 1) * pageSize;
+
+    const totalRow = await db.get('SELECT COUNT(*) AS cnt FROM audit_log');
+    const total = totalRow?.cnt || 0;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+    const safePage = Math.min(page, totalPages);
+    const safeOffset = (safePage - 1) * pageSize;
+
     const logs = await db.all(`
-        SELECT 
+        SELECT
             audit_log.id,
             audit_log.action,
             audit_log.timestamp,
@@ -140,25 +169,45 @@ router.get('/dashboard/log', async (req, res) => {
         FROM audit_log
         LEFT JOIN users ON users.id = audit_log.user_id
         ORDER BY audit_log.timestamp DESC
-    `);
+        LIMIT ? OFFSET ?
+    `, [pageSize, safeOffset]);
 
     logs.forEach(log => {
-        const d = new Date(log.timestamp);
+    const d = new Date(log.timestamp);
+    log.dateStr =
+        d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
 
-        log.dateStr =
-            d.getFullYear() + '-' +
-            String(d.getMonth() + 1).padStart(2, '0') + '-' +
-            String(d.getDate()).padStart(2, '0');
-
-        log.timeStr =
-            String(d.getHours()).padStart(2, '0') + ':' +
-            String(d.getMinutes()).padStart(2, '0');
+    log.timeStr =
+        String(d.getHours()).padStart(2, '0') + ':' +
+        String(d.getMinutes()).padStart(2, '0');
     });
 
     res.render('main/audit_log.art', {
         title: 'Audit Log',
         user: req.user,
-        logs
+        logs,
+        page: safePage,
+        totalPages,
+        total,
+        pageSize
+    });
+});
+
+router.get('/dashboard/venues', async (req, res) => {
+    if (!req.user) return res.redirect('/login');
+
+    const venues = await db.all(`
+        SELECT id, name, location, capacity, image
+        FROM venues
+        ORDER BY name ASC
+    `);
+
+    res.render('main/venues.art', {
+        title: 'Venues',
+        user: req.user,
+        venues
     });
 });
 

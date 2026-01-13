@@ -66,7 +66,8 @@ class Database {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 location TEXT NOT NULL,
-                capacity INTEGER NOT NULL
+                capacity INTEGER NOT NULL,
+                image TEXT
             )`
         );
 

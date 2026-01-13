@@ -15,7 +15,6 @@
         <span class="brand-text">Auditorium Manager</span>
     </div>
     <div class="topbar-right">
-        <input type="text" class="search" placeholder="Search events, bookings...">
         <div class="user">
             <span class="user-name">{{ user.email }} </span> |
             <% if (user.elevation == 0) user.status = "Unapproved"; %>
@@ -35,6 +34,7 @@
             <li class="sidebar-section">Management</li>
             <li><a href="/dashboard">Dashboard</a></li>
             <li><a href="/dashboard/events">Events</a></li>
+            <li><a href="/dashboard/venues">Venues</a></li>
             <li class="sidebar-section">Administration</li>
             <li><a href="/dashboard/users">Users</a></li>
             <li><a href="/dashboard/log">Audit Log</a></li>

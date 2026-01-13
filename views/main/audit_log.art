@@ -33,10 +33,18 @@
         .btn-action:hover {
             filter: brightness(1.15);
         }
+
+        .btn-action {
+            background: rgba(148,163,184,.12);
+            color: #e2e8f0;
+            }
+        .btn-action:hover { filter: brightness(1.15); }
+
     </style>
     <div class="page-header">
         <div>
-            <h1>List of users</h1>
+            <h1>Audit log</h1>
+            <p class="muted">View all the actions taken by the users on the system.</p>
             <p class="muted"></p>
         </div>
     </div>
@@ -44,7 +52,7 @@
     <section class="grid-2">
         <div class="panel stretch-horizontal">
             <div class="panel-header">
-                <h2>Event list</h2>
+                <h2>Log</h2>
             </div>
 
             <div class="table-wrapper">
@@ -59,11 +67,33 @@
                 <tbody>
                 {{each logs as log}}
                 <tr>
+                    <td><%- log.user_email %></td>
+
                     <td><%- log.action %></td>
+                    <td><%- log.dateStr %> <%- log.timeStr %></td>
                 </tr>
                 {{/each}}
                 </tbody>
             </table>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 4px;">
+                <div class="muted" style="font-size:12px;">
+                    Page <%- page %> of <%- totalPages %> · <%- total %> logs
+                </div>
+
+                <div style="display:flex; gap:8px; align-items:center;">
+                    {{if page > 1}}
+                        <a class="btn-action" style="text-decoration:none;" href="/dashboard/log?page=<%- page - 1 %>">← Prev</a>
+                    {{else}}
+                        <span class="btn-action" style="opacity:.35; cursor:not-allowed;">← Prev</span>
+                    {{/if}}
+
+                    {{if page < totalPages}}
+                        <a class="btn-action" style="text-decoration:none;" href="/dashboard/log?page=<%- page + 1 %>">Next →</a>
+                    {{else}}
+                        <span class="btn-action" style="opacity:.35; cursor:not-allowed;">Next →</span>
+                    {{/if}}
+                </div>
+            </div>
             </div>
         </div>
     </section>

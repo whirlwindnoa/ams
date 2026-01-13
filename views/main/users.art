@@ -1,42 +1,12 @@
 {{extend "./dashboard_layout.art"}}
+{{ block "head" }}
+    <link rel="stylesheet" href="/css/users.css">
+{{/block}}
 {{block "content"}}
-    <style>
-        .stretch-horizontal {
-            grid-column: 1 / -1;
-        }
-        .table-wrapper {
-            overflow: auto;
-            padding-top: 0.25rem;
-        }
-
-        .btn-action {
-            padding: 6px 10px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .btn-action.promote {
-            background: rgba(62, 255, 78, 0.15);
-            color: #9dff80;
-        }
-        .btn-action.demote {
-            background: rgba(255, 200, 49, 0.15);
-            color: #fff34f;
-        }
-        .btn-action.delete {
-            background: rgba(239,68,68,.15);
-            color: #f87171;
-        }
-
-        .btn-action:hover {
-            filter: brightness(1.15);
-        }
-    </style>
     <div class="page-header">
         <div>
             <h1>List of users</h1>
+            <p class="muted">View, approve and manage all the users currently registered in the system.</p>
             <p class="muted"></p>
         </div>
     </div>
@@ -44,7 +14,7 @@
     <section class="grid-2">
         <div class="panel stretch-horizontal">
             <div class="panel-header">
-                <h2>Event list</h2>
+                <h2>Users</h2>
             </div>
 
             <div class="table-wrapper">

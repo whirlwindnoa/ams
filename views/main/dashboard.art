@@ -5,17 +5,15 @@
 {{block "content"}}
     <div class="page-header">
         <div>
-            <h1>Dashboard</h1>
-            <p class="muted">Overview of today’s events and bookings.</p>
+            <h1>Overview</h1>
         </div>
-        <button class="btn primary">+ New Booking</button>
     </div>
 
     <section class="grid-2">
         <div class="panel upcoming-panel">
             <div class="panel-header">
                 <h2>Upcoming Events (5 at most)</h2>
-                <button class="btn ghost small">View all</button>
+                <button class="btn ghost small" onclick="window.location.href='/dashboard/events'">View all</button>
             </div>
             <table class="table">
                 <thead>
@@ -27,24 +25,32 @@
                 </tr>
                 </thead>
                 <tbody>
-                {{each events as event}}
-                <tr>
-                    <td><%- event.name %></td>
-                    <td><%- event.dateStr %> <%- event.timeStr %></td>
-                    <td><%- event.booked %> / <%- event.capacity %></td>
-                    <% if (event.status == 'scheduled') { %>
-                        <td><span class="status-pill blue">Scheduled</span></td>
-                    <% } else if (event.status == 'ongoing') { %>
-                        <td><span class="status-pill green">Ongoing</span></td>
-                    <% } else if (event.status == 'completed') { %>
-                        <td><span class="status-pill gray">Completed</span></td>
-                    <% } else if (event.status == 'postponed') { %>
-                        <td><span class="status-pill orange">Postponed</span></td>
-                    <% } else if (event.status == 'cancelled') { %>
-                        <td><span class="status-pill red">Cancelled</span></td>
-                    <% } %>
-                </tr>
-                {{/each}}
+                {{ if events && events.length }}
+                    {{each events as event}}
+                    <tr>
+                        <td><%- event.name %></td>
+                        <td><%- event.dateStr %> <%- event.timeStr %></td>
+                        <td><%- event.booked %> / <%- event.capacity %></td>
+                        <% if (event.status == 'scheduled') { %>
+                            <td><span class="status-pill blue">Scheduled</span></td>
+                        <% } else if (event.status == 'ongoing') { %>
+                            <td><span class="status-pill green">Ongoing</span></td>
+                        <% } else if (event.status == 'completed') { %>
+                            <td><span class="status-pill gray">Completed</span></td>
+                        <% } else if (event.status == 'postponed') { %>
+                            <td><span class="status-pill orange">Postponed</span></td>
+                        <% } else if (event.status == 'cancelled') { %>
+                            <td><span class="status-pill red">Cancelled</span></td>
+                        <% } %>
+                    </tr>
+                    {{/each}}
+                {{ else }}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 16px; color: rgba(226,232,240,.7);">
+                            No upcoming events found. View all to see past events.
+                        </td>
+                    </tr>
+                {{/if}}
                 </tbody>
             </table>
         </div>
